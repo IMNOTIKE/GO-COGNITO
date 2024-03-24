@@ -1,0 +1,10 @@
+db:
+  url: localhost
+  port: 5432
+  user: root
+  pwd: admin
+  schema: public
+  db_name: books
+
+server:
+  port: 8001
