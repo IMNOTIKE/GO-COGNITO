@@ -1,45 +1,46 @@
 package config
 
 import (
-	"log"
+	"fmt"
 
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/file"
-	"github.com/knadh/koanf/v2"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
-var k = koanf.New(".")
-
 type ServerConfig struct {
-	Port     int    `koanf:"server.port"`
-	HostName string `koanf:"server.hostname"`
+	Port     int    `mapstructure:"port"`
+	HostName string `mapstructure:"hostname"`
 }
 
 type DbConfig struct {
-	Url      string `koanf:"db.url"`
-	Port     int    `koanf:"db.port"`
-	User     string `koanf:"db.user"`
-	Pwd      string `koanf:"db.pwd"`
-	Schema   string `koanf:"db.schema"`
-	DbName   string `koanf:"db.db_name"`
-	PoolSize int    `koanf:"db.pool_size"`
+	Url      string `mapstructure:"url"`
+	Port     int    `mapstructure:"port"`
+	User     string `mapstructure:"user"`
+	Pwd      string `mapstructure:"pwd"`
+	Schema   string `mapstructure:"schema"`
+	DbName   string `mapstructure:"db_name"`
+	PoolSize int    `mapstructure:"pool_size"`
 }
 
 type AppConfig struct {
-	Db     DbConfig     `koanf:"db"`
-	Server ServerConfig `koanf:"server"`
+	Db     DbConfig     `mapstructure:"db"`
+	Server ServerConfig `mapstructure:"server"`
 }
 
-func LoadConfig() AppConfig {
-	// Load JSON config.
-	f := file.Provider("env/config.yaml")
-	if err := k.Load(f, yaml.Parser()); err != nil {
-		log.Fatalf("error loading config: %v", err)
+func LoadConfig() (AppConfig, error) {
+
+	viper.SetConfigName("config")
+	viper.AddConfigPath("./env")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Err(err)
+		fmt.Print(err)
+		return AppConfig{}, err
 	}
 
 	var out AppConfig
+	if err := viper.Unmarshal(&out); err != nil {
+		return AppConfig{}, err
+	}
 
-	k.UnmarshalWithConf("", &out, koanf.UnmarshalConf{Tag: "koanf"})
-
-	return out
+	return out, nil
 }

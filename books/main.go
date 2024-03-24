@@ -5,13 +5,18 @@ import (
 	"cognito/books/handlers"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
+
+	"github.com/rs/zerolog/log"
 )
 
-var bookConfig AppConfig
-
 func main() {
-	bookConfig = LoadConfig()
+	bookConfig, err := LoadConfig()
+	if err != nil {
+		log.Err(err)
+		os.Exit(1)
+	}
 
 	router := handlers.GetHandler(bookConfig)
 

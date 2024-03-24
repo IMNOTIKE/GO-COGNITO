@@ -21,14 +21,10 @@ func GetHandler(config config.AppConfig) http.ServeMux {
 	router.HandleFunc("GET /books", func(w http.ResponseWriter, r *http.Request) {
 		requestedIsbn := r.URL.Query().Get("isbn")
 		if requestedIsbn != "" {
-			books, err := service.GetByISBN(requestedIsbn)
-			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(err)
-			} else {
-				w.WriteHeader(http.StatusOK)
-				json.NewEncoder(w).Encode(books)
-			}
+			books, _ := service.GetByISBN(requestedIsbn)
+
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(books)
 		} else {
 			books, err := service.GetAll()
 			if err != nil {
