@@ -5,6 +5,8 @@ db:
   pwd: admin
   schema: public
   db_name: books
+  pool_size: 50
 
 server:
   port: 8001
+  hostname: test
